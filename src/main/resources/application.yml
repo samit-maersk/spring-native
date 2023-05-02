@@ -1,6 +1,10 @@
+
 spring:
   application:
     name: @project.name@
     version: @project.version@
     jsonplaceholder:
       host: https://jsonplaceholder.typicode.com
+server:
+  error:
+    include-message: always

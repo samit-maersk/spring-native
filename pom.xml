@@ -53,18 +53,6 @@
 			<plugin>
 				<groupId>org.graalvm.buildtools</groupId>
 				<artifactId>native-maven-plugin</artifactId>
-				<configuration>
-
-					<metadataRepository>
-						<dependencies>
-							<dependency>
-								<groupId>org.springframework.cloud</groupId>
-								<artifactId>spring-cloud-contract-wiremock</artifactId>
-								<version>4.0.2</version>
-							</dependency>
-						</dependencies>
-					</metadataRepository>
-				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

@@ -1,17 +1,15 @@
 package net.samitkumar.springnative;
 
-import com.github.tomakehurst.wiremock.client.WireMock;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.test.StepVerifier;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -37,7 +35,7 @@ class UserClientTests {
 
 	@DynamicPropertySource
 	static void registerPgProperties(DynamicPropertyRegistry registry) {
-		registry.add("spring.application.jsonplaceholder.host", () -> String.format("http://localhost:${wiremock.server.port}"));
+		registry.add("spring.application.jsonplaceholder.host", () -> "http://localhost:${wiremock.server.port}");
 	}
 
 	@BeforeEach
@@ -138,11 +136,39 @@ class UserClientTests {
 								}
 								""")));
 
-		userClient.getUserbyId(1)
+		userClient.getUserById(1)
 				.as(StepVerifier::create)
 				.consumeNextWith(user -> {
 					assertEquals(1, user.id());
 					assertEquals("Leanne Graham", user.name());
 				}).verifyComplete();
+	}
+}
+
+@SpringBootTest
+@AutoConfigureWebTestClient(timeout = "10000")
+class RouterTest {
+	@Autowired
+	WebTestClient webTestClient;
+
+	@Test
+	void personGetAllTest() {
+		webTestClient.get()
+				.uri("/person")
+				.exchange()
+				.expectStatus().isOk()
+				.expectBody()
+				.equals("Hello World");
+	}
+
+	@Test
+	void personGetByIdTest() {
+		webTestClient.get()
+				.uri("/person/1")
+				.exchange()
+				.expectStatus()
+				.isOk()
+				.expectBody()
+				.equals("Hello Samit");
 	}
 }
